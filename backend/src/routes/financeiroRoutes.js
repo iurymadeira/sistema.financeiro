@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const financeiroController = require('../controllers/financeiroController');
 const transacaoController = require('../controllers/transacaoController');
+const estadoAplicacaoController = require('../controllers/estadoAplicacaoController');
+
+router.get('/state', estadoAplicacaoController.buscar);
+router.put('/state', estadoAplicacaoController.salvar);
 
 // --- Rotas de Projeção (existentes) ---
 router.post('/calcular', financeiroController.calcularEProjetar);

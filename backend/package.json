@@ -4,6 +4,7 @@
   "description": "",
   "main": "teste.js",
   "scripts": {
+    "dev": "node src/server.js",
     "test": "node tests/teste.js"
   },
   "keywords": [],

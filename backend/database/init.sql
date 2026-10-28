@@ -56,6 +56,13 @@ CREATE TABLE IF NOT EXISTS transacao_excecoes (
     FOREIGN KEY (transacao_pai_id) REFERENCES transacoes(id) ON DELETE CASCADE
 );
 
+-- Estado completo da aplicação para o modo local de usuário único.
+CREATE TABLE IF NOT EXISTS estado_aplicacao (
+    id TINYINT PRIMARY KEY,
+    dados JSON NOT NULL,
+    atualizado_em DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 -- Categorias Padrão do Sistema
 INSERT INTO categorias (usuario_id, nome, icone, tipo) VALUES
 (NULL, 'Ajuste de Saldo', 'sliders', 'NEUTRO'),
