@@ -1,4 +1,11 @@
 node_modules/
+.next/
+dist/
 .DS_Store
 *.log
-*.env
+
+# Segredos: nunca versionar. Só os arquivos de exemplo entram no Git.
+.env
+.env.*
+!.env_example
+!.env.example

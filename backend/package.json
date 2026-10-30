@@ -1,11 +1,12 @@
 {
-  "name": "projeto-sem-nome",
+  "name": "sistema-financeiro-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "teste.js",
+  "main": "src/server.js",
   "scripts": {
     "dev": "node src/server.js",
-    "test": "node tests/teste.js"
+    "start": "node src/server.js",
+    "test": "node --test"
   },
   "keywords": [],
   "author": "",

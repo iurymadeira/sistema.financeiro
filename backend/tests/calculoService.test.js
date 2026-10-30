@@ -1,6 +1,6 @@
+const test = require('node:test');
+const assert = require('node:assert/strict');
 const { calcularProjecao, obterMetricasProjecao } = require('../src/services/calculoService');
-
-console.log('--- EXECUTANDO TESTES UNITÁRIOS DO SERVIÇO DE CÁLCULO ---');
 
 const dataHoje = new Date();
 const anoAtual = dataHoje.getFullYear();
@@ -45,26 +45,21 @@ const excecoesMock = [
   }
 ];
 
-// Executa projeção para 1 ano com saldo inicial R$ 1000
+// Projeção de 1 ano com saldo inicial de R$ 1000
 const resultado = calcularProjecao(1000, transacoesMock, excecoesMock, 1, new Date(anoAtual, 0, 1));
-const metricas = obterMetricasProjecao(resultado);
-
-console.log('Projeção gerada para o ano:', Object.keys(resultado));
 const mesesAno = resultado[anoAtual];
 
-console.log(`- Mês 1 (Janeiro): Receitas R$ ${mesesAno[0].receitasDoMes} | Gastos R$ ${mesesAno[0].gastosDoMes} | Saldo R$ ${mesesAno[0].saldo}`);
-console.log(`- Mês 2 (Fevereiro - com exceção no aluguel): Receitas R$ ${mesesAno[1].receitasDoMes} | Gastos R$ ${mesesAno[1].gastosDoMes} | Saldo R$ ${mesesAno[1].saldo}`);
+test('a projeção de 1 ano gera 12 meses', () => {
+  assert.equal(mesesAno.length, 12);
+});
 
-if (mesesAno.length === 12) {
-  console.log('TESTE 1 PASSOU: 12 meses gerados.');
-} else {
-  console.error('TESTE 1 FALHOU.');
-}
+test('a exceção de valor vale só no mês dela (aluguel de R$ 2000 em fevereiro)', () => {
+  assert.equal(mesesAno[0].gastosDoMes, 1500); // janeiro: valor normal da regra
+  assert.equal(mesesAno[1].gastosDoMes, 2000); // fevereiro: exceção
+  assert.equal(mesesAno[2].gastosDoMes, 1500); // março volta ao normal
+});
 
-if (mesesAno[1].gastosDoMes === 2000) {
-  console.log('TESTE 2 PASSOU: Exceção de alteração de valor aplicada com sucesso no 2º mês (R$ 2000.00).');
-} else {
-  console.error(`TESTE 2 FALHOU: Esperava 2000.00 nos gastos do mês 2, recebeu ${mesesAno[1].gastosDoMes}`);
-}
-
-console.log('--- TESTES CONCLUÍDOS COM SUCESSO ---');
+test('as métricas da projeção são calculadas', () => {
+  const metricas = obterMetricasProjecao(resultado);
+  assert.ok(metricas);
+});
