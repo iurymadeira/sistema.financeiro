@@ -21,9 +21,9 @@ test.after(async () => ctx && (await ctx.drop()));
 
 test('aplica todas as migrations num banco vazio e registra cada uma', { skip }, async () => {
   const applied = await migrate(ctx.pool);
-  assert.deepEqual(applied, ['001_esquema_inicial.sql', '002_categorias_padrao.sql', '003_tabelas_provisorias.sql']);
+  assert.deepEqual(applied, ['001_esquema_inicial.sql', '002_categorias_padrao.sql', '003_tabelas_provisorias.sql', '004_usuario_provisorio.sql']);
   const { rows } = await ctx.pool.query('SELECT count(*)::int AS n FROM schema_migrations');
-  assert.equal(rows[0].n, 3);
+  assert.equal(rows[0].n, 4);
 });
 
 test('rodar de novo não faz nada (idempotente)', { skip }, async () => {
