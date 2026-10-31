@@ -8,7 +8,7 @@ Sistema de finanças pessoais: saldo, movimentações e recorrências, históric
 |---|---|
 | Front-end (`frontend/`) | Next.js 16 (App Router), React 19, Tailwind CSS 4, Lucide |
 | Back-end (`backend/`) | Node.js, Express 5 |
-| Banco de dados | MySQL 8 (Docker); migração para PostgreSQL planejada |
+| Banco de dados | PostgreSQL 16 (Docker), com migrations em SQL |
 | Qualidade | testes com `node:test`, ESLint, CI no GitHub Actions |
 
 ## Como rodar
@@ -16,13 +16,14 @@ Sistema de finanças pessoais: saldo, movimentações e recorrências, históric
 Pré-requisitos: Node.js 22 e Docker.
 
 ```bash
-# 1) Banco de dados
-cp backend/.env_example backend/.env     # ajuste as senhas
-docker compose up -d
+# 1) Banco de dados (Postgres + Adminer em http://localhost:8080)
+cp backend/.env_example backend/.env     # ajuste a senha
+docker compose --env-file backend/.env up -d
 
 # 2) Back-end (porta 5000)
 cd backend
 npm install
+npm run migrate                          # cria/atualiza as tabelas
 npm run dev
 
 # 3) Front-end (porta 3000), em outro terminal
@@ -37,6 +38,7 @@ Abra http://localhost:3000.
 
 ```bash
 cd frontend && npm run lint && npm test && npm run build
+# o back-end testa o banco de verdade: defina TEST_DATABASE_URL (veja o CI) ou os testes de banco são pulados
 cd backend  && npm test
 ```
 
