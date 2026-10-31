@@ -16,18 +16,18 @@ exports.calcularEProjetar = async (req, res) => {
 
     const metricas = calculoService.obterMetricasProjecao(projecao);
 
-    // 2. Persiste as configurações no MySQL
+    // 2. Persiste as configurações no banco
     const sql = `
       INSERT INTO configuracao_financeira (id, saldo_inicial, gastos_fixos, receitas_fixas, anos_projecao)
-      VALUES (1, ?, ?, ?, ?)
-      ON DUPLICATE KEY UPDATE
-        saldo_inicial = VALUES(saldo_inicial),
-        gastos_fixos = VALUES(gastos_fixos),
-        receitas_fixas = VALUES(receitas_fixas),
-        anos_projecao = VALUES(anos_projecao);
+      VALUES (1, $1, $2, $3, $4)
+      ON CONFLICT (id) DO UPDATE SET
+        saldo_inicial = EXCLUDED.saldo_inicial,
+        gastos_fixos = EXCLUDED.gastos_fixos,
+        receitas_fixas = EXCLUDED.receitas_fixas,
+        anos_projecao = EXCLUDED.anos_projecao;
     `;
 
-    await db.execute(sql, [saldoInicial, gastosFixos, receitasFixas, anos]);
+    await db.query(sql, [saldoInicial, gastosFixos, receitasFixas, anos]);
 
     // 3. Retorna a projeção e métricas calculadas para a tela
     res.json({
@@ -43,7 +43,7 @@ exports.calcularEProjetar = async (req, res) => {
 
 exports.carregarConfiguracao = async (req, res) => {
   try {
-    const [linhas] = await db.execute('SELECT * FROM configuracao_financeira WHERE id = 1');
+    const { rows: linhas } = await db.query('SELECT * FROM configuracao_financeira WHERE id = 1');
 
     if (linhas.length === 0) return res.json(null);
 
@@ -55,7 +55,7 @@ exports.carregarConfiguracao = async (req, res) => {
       anos: parseInt(dado.anos_projecao)
     });
   } catch (erro) {
-    console.error('Erro ao carregar do MySQL:', erro);
+    console.error('Erro ao carregar do banco:', erro);
     res.status(500).json({ sucesso: false, erro: 'Erro interno ao consultar o banco.' });
   }
 };
