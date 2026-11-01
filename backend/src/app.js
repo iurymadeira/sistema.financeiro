@@ -16,7 +16,7 @@ const { criarExcecoesController } = require('./controllers/excecoesController');
 const { criarExcecoesRoutes } = require('./routes/excecoesRoutes');
 const { criarRelogio } = require('./domain/relogio');
 require('./config/tiposPg');
-const financeiroRoutes = require('./routes/financeiroRoutes'); // PROVISÓRIO (/state, /calcular)
+const estadoRoutes = require('./routes/estadoRoutes'); // PROVISÓRIO (/state)
 
 // A "fábrica" do app: recebe o banco de fora (pool). Assim os testes montam o app num banco isolado,
 // e o server.js monta com o banco de verdade. Aqui é o único lugar que liga repository -> service -> controller.
@@ -32,21 +32,21 @@ function createApp({ pool, frontendOrigin, usuarioEmail, relogio = criarRelogio(
   app.use(express.json({ limit: '5mb' })); // 5 MB só por causa do /state provisório; cai para o padrão quando ele sair
 
   // Rotas antigas, sem usuário (saem no PR 3)
-  app.use('/api', financeiroRoutes);
+  app.use('/api', estadoRoutes);
 
-  // Rotas novas: todas passam por "quem é o usuário?"
+  // Rotas novas: cada recurso passa por "quem é o usuário?" (rota que não existe responde 404 sem tocar no banco)
   const api = express.Router();
-  api.use(identificarUsuario(pool, usuarioEmail));
+  const quem = identificarUsuario(pool, usuarioEmail);
 
   const categorias = criarCategoriasController(criarCategoriasService(criarCategoriasRepository(pool)));
-  api.use('/categories', criarCategoriasRoutes(categorias));
+  api.use('/categories', quem, criarCategoriasRoutes(categorias));
 
   const movimentacoesRepo = criarMovimentacoesRepository(pool);
   const movimentacoes = criarMovimentacoesController(criarMovimentacoesService(movimentacoesRepo, relogio));
   const excecoes = criarExcecoesRoutes(criarExcecoesController(criarExcecoesService(movimentacoesRepo)));
-  api.use('/exceptions', excecoes.lista);
-  api.use('/movements/:id/exceptions', excecoes.porMovimentacao);
-  api.use('/movements', criarMovimentacoesRoutes(movimentacoes));
+  api.use('/exceptions', quem, excecoes.lista);
+  api.use('/movements/:id/exceptions', quem, excecoes.porMovimentacao);
+  api.use('/movements', quem, criarMovimentacoesRoutes(movimentacoes));
 
   app.use('/api', api);
   app.use(naoEncontrado);

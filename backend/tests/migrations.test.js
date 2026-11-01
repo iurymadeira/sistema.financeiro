@@ -21,9 +21,9 @@ test.after(async () => ctx && (await ctx.drop()));
 
 test('aplica todas as migrations num banco vazio e registra cada uma', { skip }, async () => {
   const applied = await migrate(ctx.pool);
-  assert.deepEqual(applied, ['001_esquema_inicial.sql', '002_categorias_padrao.sql', '003_tabelas_provisorias.sql', '004_usuario_provisorio.sql']);
+  assert.deepEqual(applied, ['001_esquema_inicial.sql', '002_categorias_padrao.sql', '003_tabelas_provisorias.sql', '004_usuario_provisorio.sql', '005_remove_configuracao_financeira.sql']);
   const { rows } = await ctx.pool.query('SELECT count(*)::int AS n FROM schema_migrations');
-  assert.equal(rows[0].n, 4);
+  assert.equal(rows[0].n, 5);
 });
 
 test('rodar de novo não faz nada (idempotente)', { skip }, async () => {
@@ -109,4 +109,10 @@ test('migration que falha desfaz tudo (transação) e não é registrada', { ski
   assert.equal(rows[0].b, null, 'a 002 foi desfeita por inteiro, inclusive o CREATE TABLE que vinha antes do erro');
   const { rows: reg } = await ctx.pool.query("SELECT nome FROM schema_migrations WHERE nome LIKE '00_\\_%'  ORDER BY nome");
   assert.ok(!reg.some((r) => r.nome === '002_quebra.sql'));
+});
+
+test('a tabela da rota /calcular foi removida (ADR 0023); a do /state provisório continua', { skip }, async () => {
+  const { rows } = await ctx.pool.query(
+    `SELECT table_name FROM information_schema.tables WHERE table_schema = current_schema() AND table_name IN ('configuracao_financeira', 'estado_aplicacao')`);
+  assert.deepEqual(rows.map((r) => r.table_name), ['estado_aplicacao']);
 });
