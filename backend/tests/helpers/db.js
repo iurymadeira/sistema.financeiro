@@ -1,6 +1,7 @@
 // Ajuda dos testes de integração: cria um schema novo e isolado por arquivo de teste.
 // Precisam de um Postgres de teste: defina TEST_DATABASE_URL (o CI faz isso). Sem ela, são pulados.
 const { Pool } = require('pg');
+require('../../src/config/tiposPg');
 
 const URL = process.env.TEST_DATABASE_URL;
 const skip = URL ? false : 'defina TEST_DATABASE_URL para rodar os testes de banco';

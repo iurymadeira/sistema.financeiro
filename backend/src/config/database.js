@@ -1,4 +1,5 @@
 const { Pool } = require('pg');
+require('./tiposPg');
 require('dotenv').config();
 
 // Hospedagens costumam fornecer uma única DATABASE_URL; no desenvolvimento usamos as variáveis separadas.
