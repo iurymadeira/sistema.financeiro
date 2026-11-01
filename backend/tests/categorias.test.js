@@ -118,3 +118,11 @@ test('sem o usuário provisório (migration não rodou) a API avisa com clareza'
   console.error = orig;
   erro(res, 500, 'provisional_user_missing');
 });
+
+test('rotas removidas e inexistentes respondem 404 sem consultar o banco (ADR 0023)', { skip }, async (t) => {
+  const app = await startApp({ usuarioEmail: 'nao-existe@exemplo.com' }); // se a rota consultasse o usuário, daria 500
+  t.after(app.close);
+  erro(await app.request('POST', '/calcular', {}), 404, 'not_found');
+  erro(await app.request('GET', '/carregar'), 404, 'not_found');
+  erro(await app.request('GET', '/qualquer-coisa'), 404, 'not_found');
+});
