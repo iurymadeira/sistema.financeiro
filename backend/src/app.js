@@ -14,13 +14,17 @@ const { criarMovimentacoesRoutes } = require('./routes/movimentacoesRoutes');
 const { criarExcecoesService } = require('./services/excecoesService');
 const { criarExcecoesController } = require('./controllers/excecoesController');
 const { criarExcecoesRoutes } = require('./routes/excecoesRoutes');
+const { criarPerfilRepository } = require('./repositories/perfilRepository');
+const { criarPerfilService } = require('./services/perfilService');
+const { criarPerfilController } = require('./controllers/perfilController');
+const { criarPerfilRoutes } = require('./routes/perfilRoutes');
 const { criarRelogio } = require('./domain/relogio');
 require('./config/tiposPg');
 const estadoRoutes = require('./routes/estadoRoutes'); // PROVISÓRIO (/state)
 
 // A "fábrica" do app: recebe o banco de fora (pool). Assim os testes montam o app num banco isolado,
 // e o server.js monta com o banco de verdade. Aqui é o único lugar que liga repository -> service -> controller.
-function createApp({ pool, frontendOrigin, usuarioEmail, relogio = criarRelogio() } = {}) {
+function createApp({ pool, frontendOrigin, relogio = criarRelogio() } = {}) {
   const app = express();
 
   app.use(
@@ -36,9 +40,11 @@ function createApp({ pool, frontendOrigin, usuarioEmail, relogio = criarRelogio(
 
   // Rotas novas: cada recurso passa por "quem é o usuário?" (rota que não existe responde 404 sem tocar no banco)
   const api = express.Router();
-  const quem = identificarUsuario(pool, usuarioEmail);
+  const quem = identificarUsuario(pool);
 
   const categorias = criarCategoriasController(criarCategoriasService(criarCategoriasRepository(pool)));
+  const perfil = criarPerfilController(criarPerfilService(criarPerfilRepository(pool)));
+  api.use('/me', quem, criarPerfilRoutes(perfil));
   api.use('/categories', quem, criarCategoriasRoutes(categorias));
 
   const movimentacoesRepo = criarMovimentacoesRepository(pool);
