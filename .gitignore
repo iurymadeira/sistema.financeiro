@@ -4,8 +4,9 @@ dist/
 .DS_Store
 *.log
 
-# Segredos: nunca versionar. Só os arquivos de exemplo entram no Git.
 .env
 .env.*
 !.env_example
 !.env.example
+CLAUDE.md
+/docs/
