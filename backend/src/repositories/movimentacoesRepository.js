@@ -24,6 +24,17 @@ function paraApi(r) {
 }
 
 // `db` é o pool (cada comando solto) ou um client dentro de uma transação (vários comandos juntos).
+function excecaoParaApi(r) {
+  return {
+    id: String(r.id),
+    movementId: String(r.transacao_pai_id),
+    originalDate: r.data_original,
+    newAmount: r.centavos === null ? null : Number(r.centavos),
+    newDate: r.nova_data,
+    cancelled: r.cancelado,
+  };
+}
+
 function criarRepositorio(db, pool) {
   const repo = {
     async listar(usuarioId) {
@@ -78,6 +89,36 @@ function criarRepositorio(db, pool) {
     // As exceções (transacao_excecoes) saem junto, por ON DELETE CASCADE
     async apagar(id) {
       await db.query('DELETE FROM transacoes WHERE id = $1', [id]);
+    },
+
+    // ---- Exceções: ajustes de UM mês de uma recorrência (ADR 0013). Vivem junto da movimentação
+    // (mesmo "agregado"), por isso compartilham o repositório e a transação.
+    async listarExcecoes(usuarioId) {
+      const { rows } = await db.query(
+        `SELECT e.id, e.transacao_pai_id, e.data_original, e.nova_data, e.cancelado,
+                (e.novo_valor * 100)::bigint AS centavos
+           FROM transacao_excecoes e JOIN transacoes t ON t.id = e.transacao_pai_id
+          WHERE t.usuario_id = $1 ORDER BY e.transacao_pai_id, e.data_original`,
+        [usuarioId],
+      );
+      return rows.map(excecaoParaApi);
+    },
+
+    // Um mês, no máximo uma exceção: gravar de novo SUBSTITUI a anterior.
+    async salvarExcecao(movimentacaoId, { dataOriginal, novoValor, novaData, cancelado }) {
+      const { rows } = await db.query(
+        `INSERT INTO transacao_excecoes (transacao_pai_id, data_original, novo_valor, nova_data, cancelado)
+         VALUES ($1, $2, CASE WHEN $3::bigint IS NULL THEN NULL ELSE ($3::bigint)::numeric / 100 END, $4, $5)
+         ON CONFLICT (transacao_pai_id, data_original)
+         DO UPDATE SET novo_valor = EXCLUDED.novo_valor, nova_data = EXCLUDED.nova_data, cancelado = EXCLUDED.cancelado
+         RETURNING id, transacao_pai_id, data_original, nova_data, cancelado, (novo_valor * 100)::bigint AS centavos`,
+        [movimentacaoId, dataOriginal, novoValor, novaData, cancelado],
+      );
+      return excecaoParaApi(rows[0]);
+    },
+
+    async apagarExcecao(movimentacaoId, dataOriginal) {
+      await db.query('DELETE FROM transacao_excecoes WHERE transacao_pai_id = $1 AND data_original = $2', [movimentacaoId, dataOriginal]);
     },
 
     async datasDasExcecoes(id) {
