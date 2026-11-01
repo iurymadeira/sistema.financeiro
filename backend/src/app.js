@@ -11,6 +11,9 @@ const { criarMovimentacoesRepository } = require('./repositories/movimentacoesRe
 const { criarMovimentacoesService } = require('./services/movimentacoesService');
 const { criarMovimentacoesController } = require('./controllers/movimentacoesController');
 const { criarMovimentacoesRoutes } = require('./routes/movimentacoesRoutes');
+const { criarExcecoesService } = require('./services/excecoesService');
+const { criarExcecoesController } = require('./controllers/excecoesController');
+const { criarExcecoesRoutes } = require('./routes/excecoesRoutes');
 const { criarRelogio } = require('./domain/relogio');
 require('./config/tiposPg');
 const financeiroRoutes = require('./routes/financeiroRoutes'); // PROVISÓRIO (/state, /calcular)
@@ -38,7 +41,11 @@ function createApp({ pool, frontendOrigin, usuarioEmail, relogio = criarRelogio(
   const categorias = criarCategoriasController(criarCategoriasService(criarCategoriasRepository(pool)));
   api.use('/categories', criarCategoriasRoutes(categorias));
 
-  const movimentacoes = criarMovimentacoesController(criarMovimentacoesService(criarMovimentacoesRepository(pool), relogio));
+  const movimentacoesRepo = criarMovimentacoesRepository(pool);
+  const movimentacoes = criarMovimentacoesController(criarMovimentacoesService(movimentacoesRepo, relogio));
+  const excecoes = criarExcecoesRoutes(criarExcecoesController(criarExcecoesService(movimentacoesRepo)));
+  api.use('/exceptions', excecoes.lista);
+  api.use('/movements/:id/exceptions', excecoes.porMovimentacao);
   api.use('/movements', criarMovimentacoesRoutes(movimentacoes));
 
   app.use('/api', api);
