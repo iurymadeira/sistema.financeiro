@@ -111,8 +111,9 @@ test('isolamento: categoria de outro usuário nunca aparece', { skip }, async (t
 });
 
 test('sem o usuário provisório (migration não rodou) a API avisa com clareza', { skip }, async (t) => {
-  const app = await startApp({ usuarioEmail: 'nao-existe@exemplo.com' });
+  const app = await startApp();
   t.after(app.close);
+  await app.pool.query("DELETE FROM usuarios WHERE senha_hash = '!sem-login'"); // simula banco sem o usuário provisório
   const orig = console.error;
   const res = await app.request('GET', '/categories');
   console.error = orig;
@@ -120,8 +121,9 @@ test('sem o usuário provisório (migration não rodou) a API avisa com clareza'
 });
 
 test('rotas removidas e inexistentes respondem 404 sem consultar o banco (ADR 0023)', { skip }, async (t) => {
-  const app = await startApp({ usuarioEmail: 'nao-existe@exemplo.com' }); // se a rota consultasse o usuário, daria 500
+  const app = await startApp();
   t.after(app.close);
+  await app.pool.query("DELETE FROM usuarios WHERE senha_hash = '!sem-login'"); // se a rota consultasse o usuário, daria 500
   erro(await app.request('POST', '/calcular', {}), 404, 'not_found');
   erro(await app.request('GET', '/carregar'), 404, 'not_found');
   erro(await app.request('GET', '/qualquer-coisa'), 404, 'not_found');
