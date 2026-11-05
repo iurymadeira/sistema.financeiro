@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { repository } from '../data/repository.js'
+import { repository } from '../api/index.js'
 
 // Perfil do usuário logado (nome, e-mail, foto) e as ações de alterá-lo.
 export function useProfile() {

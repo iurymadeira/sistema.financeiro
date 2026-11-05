@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { repository } from '../data/repository.js'
+import { repository } from '../api/index.js'
 
 // Carrega lançamentos e categorias e expõe as ações. Depois de cada ação, recarrega os dados.
 export function useFinanceData() {

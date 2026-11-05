@@ -20,7 +20,6 @@ const { criarPerfilController } = require('./controllers/perfilController');
 const { criarPerfilRoutes } = require('./routes/perfilRoutes');
 const { criarRelogio } = require('./domain/relogio');
 require('./config/tiposPg');
-const estadoRoutes = require('./routes/estadoRoutes'); // PROVISÓRIO (/state)
 
 // A "fábrica" do app: recebe o banco de fora (pool). Assim os testes montam o app num banco isolado,
 // e o server.js monta com o banco de verdade. Aqui é o único lugar que liga repository -> service -> controller.
@@ -33,10 +32,7 @@ function createApp({ pool, frontendOrigin, relogio = criarRelogio() } = {}) {
       credentials: true, // o front envia cookie de sessão (docs/api.md)
     }),
   );
-  app.use(express.json({ limit: '5mb' })); // 5 MB só por causa do /state provisório; cai para o padrão quando ele sair
-
-  // Rotas antigas, sem usuário (saem no PR 3)
-  app.use('/api', estadoRoutes);
+  app.use(express.json({ limit: '512kb' })); // o maior corpo legítimo é a foto do perfil (até 200 mil caracteres)
 
   // Rotas novas: cada recurso passa por "quem é o usuário?" (rota que não existe responde 404 sem tocar no banco)
   const api = express.Router();

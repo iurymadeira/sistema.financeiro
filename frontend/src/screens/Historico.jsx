@@ -2,7 +2,7 @@
  * Historico.jsx — Tela "Histórico financeiro"
  *
  * Dependências: react, lucide-react, Tailwind CSS (fonte Figtree configurada como font-sans).
- * Dados: src/data/repository.js (via useFinanceData) e src/data/history.js (cálculos).
+ * Dados: src/api/apiRepository.js (via useFinanceData) e src/data/history.js (cálculos).
  */
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { ArrowLeft, Inbox, X } from 'lucide-react'
