@@ -8,7 +8,7 @@
  *   {open && <MovimentacaoRapida onClose={() => setOpen(false)} />}
  *
  * Dependências: react, lucide-react, Tailwind CSS (fonte Figtree configurada como font-sans).
- * Dados: src/data/repository.js (via useFinanceData).
+ * Dados: src/api/apiRepository.js (via useFinanceData).
  */
 import { useEffect, useRef, useState } from 'react'
 import { Check, X } from 'lucide-react'

@@ -7,7 +7,7 @@
  * É uma estimativa, não uma garantia de rentabilidade.
  *
  * Dependências: react, lucide-react, Tailwind CSS (fonte Figtree configurada como font-sans).
- * Dados: src/data/repository.js (via useFinanceData), src/data/history.js e src/data/projection.js.
+ * Dados: src/api/apiRepository.js (via useFinanceData), src/data/history.js e src/data/projection.js.
  */
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { ArrowLeft, Flag, Minus, Plus, Target, TrendingDown } from 'lucide-react'

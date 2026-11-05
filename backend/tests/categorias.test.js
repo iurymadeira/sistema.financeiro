@@ -127,4 +127,13 @@ test('rotas removidas e inexistentes respondem 404 sem consultar o banco (ADR 00
   erro(await app.request('POST', '/calcular', {}), 404, 'not_found');
   erro(await app.request('GET', '/carregar'), 404, 'not_found');
   erro(await app.request('GET', '/qualquer-coisa'), 404, 'not_found');
+  erro(await app.request('GET', '/state'), 404, 'not_found'); // ADR 0025: o pacote único saiu
+  erro(await app.request('PUT', '/state', { state: {} }), 404, 'not_found');
+});
+
+test('corpo grande demais é recusado com 413 no formato padrão de erro', { skip }, async (t) => {
+  const app = await startApp();
+  t.after(app.close);
+  const grande = { name: 'x'.repeat(600_000), type: 'despesa', icon: 'Gift' };
+  erro(await app.request('POST', '/categories', grande), 413, 'payload_too_large');
 });

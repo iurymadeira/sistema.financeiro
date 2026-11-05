@@ -21,9 +21,9 @@ test.after(async () => ctx && (await ctx.drop()));
 
 test('aplica todas as migrations num banco vazio e registra cada uma', { skip }, async () => {
   const applied = await migrate(ctx.pool);
-  assert.deepEqual(applied, ['001_esquema_inicial.sql', '002_categorias_padrao.sql', '003_tabelas_provisorias.sql', '004_usuario_provisorio.sql', '005_remove_configuracao_financeira.sql', '006_perfil_do_usuario.sql']);
+  assert.deepEqual(applied, ['001_esquema_inicial.sql', '002_categorias_padrao.sql', '003_tabelas_provisorias.sql', '004_usuario_provisorio.sql', '005_remove_configuracao_financeira.sql', '006_perfil_do_usuario.sql', '007_remove_estado_aplicacao.sql']);
   const { rows } = await ctx.pool.query('SELECT count(*)::int AS n FROM schema_migrations');
-  assert.equal(rows[0].n, 6);
+  assert.equal(rows[0].n, 7);
 });
 
 test('rodar de novo não faz nada (idempotente)', { skip }, async () => {
@@ -111,8 +111,8 @@ test('migration que falha desfaz tudo (transação) e não é registrada', { ski
   assert.ok(!reg.some((r) => r.nome === '002_quebra.sql'));
 });
 
-test('a tabela da rota /calcular foi removida (ADR 0023); a do /state provisório continua', { skip }, async () => {
+test('as tabelas provisórias (/calcular e /state) foram removidas (ADR 0023 e 0025)', { skip }, async () => {
   const { rows } = await ctx.pool.query(
     `SELECT table_name FROM information_schema.tables WHERE table_schema = current_schema() AND table_name IN ('configuracao_financeira', 'estado_aplicacao')`);
-  assert.deepEqual(rows.map((r) => r.table_name), ['estado_aplicacao']);
+  assert.deepEqual(rows, []);
 });

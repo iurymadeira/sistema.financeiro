@@ -2,7 +2,7 @@
  * Movimentacoes.jsx — Tela "Movimentações e recorrências"
  *
  * Dependências: react, lucide-react, Tailwind CSS (fonte Figtree configurada como font-sans).
- * Dados: src/data/repository.js (persistidos pela API do backend).
+ * Dados: src/api/apiRepository.js (via useFinanceData, persistidos pela API).
  */
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
