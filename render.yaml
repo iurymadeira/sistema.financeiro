@@ -1,0 +1,25 @@
+# "Blueprint" do Render: descreve o servidor da API (ver docs/deploy.md).
+# O banco NÃO fica aqui: usamos o Neon (o Postgres grátis do Render expira em 30 dias).
+services:
+  - type: web
+    name: financeiro-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm ci
+    startCommand: npm run start:prod
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: DB_SSL
+        value: "true"
+      - key: DATABASE_URL
+        sync: false # você digita no painel (conexão direta do Neon)
+      - key: ACCESS_PASSWORD
+        sync: false # você inventa uma senha e digita no painel
+      - key: FRONTEND_ORIGIN
+        sync: false # endereço do site na Vercel, sem barra no final

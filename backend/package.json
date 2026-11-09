@@ -7,7 +7,8 @@
     "dev": "node src/server.js",
     "start": "node src/server.js",
     "migrate": "node src/db/migrate.js",
-    "test": "node --test"
+    "test": "node --test",
+    "start:prod": "npm run migrate && npm start"
   },
   "keywords": [],
   "author": "",

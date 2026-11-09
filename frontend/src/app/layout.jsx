@@ -1,4 +1,5 @@
 import './globals.css'
+import AccessGate from '../components/AccessGate.jsx'
 import AppShell from '../components/AppShell.jsx'
 
 export const metadata = {
@@ -16,7 +17,9 @@ export default function RootLayout({ children }) {
         <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
       <body>
-        <AppShell>{children}</AppShell>
+        <AccessGate>
+          <AppShell>{children}</AppShell>
+        </AccessGate>
       </body>
     </html>
   )

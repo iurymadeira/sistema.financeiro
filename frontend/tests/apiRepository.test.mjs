@@ -104,3 +104,22 @@ test('trocar senha segue simulada: valida o formulário e NÃO chama o servidor 
   await repo.changePassword({ current: 'senhaantiga1', next: 'novasenha123', confirm: 'novasenha123' })
   assert.equal(calls.length, 0)
 })
+
+test('envia a senha de acesso no cabeçalho X-Access-Key e avisa quando a API a recusa', async () => {
+  const headersVistos = []
+  let negada = 0
+  const fetchImpl = async (url, init) => {
+    headersVistos.push(init.headers)
+    return { status: 401, ok: false, json: async () => ({ error: { code: 'access_denied', message: 'Senha de acesso inválida.' } }) }
+  }
+  const repo = createApiRepository('http://api.test/api', fetchImpl, { getAccessKey: () => 'segredo', onDenied: () => negada++ })
+  await assert.rejects(repo.checkAccess(), (e) => e.status === 401 && e.code === 'access_denied')
+  assert.equal(headersVistos[0]['X-Access-Key'], 'segredo')
+  assert.equal(negada, 1)
+})
+
+test('sem senha guardada, não manda o cabeçalho; checkAccess faz GET /access', async () => {
+  const { repo, calls } = fake([{ status: 204 }])
+  assert.equal(await repo.checkAccess(), null)
+  assert.equal(calls[0].url, 'http://api.test/api/access')
+})
