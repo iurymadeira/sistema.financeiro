@@ -10,10 +10,13 @@ import { createHttp } from './http.js'
 const EDITABLE_FIELDS = ['amount', 'date', 'description', 'method', 'recurring', 'endDate']
 const enc = encodeURIComponent
 
-export function createApiRepository(baseUrl, fetchImpl) {
-  const http = createHttp(baseUrl, fetchImpl)
+export function createApiRepository(baseUrl, fetchImpl, httpOptions) {
+  const http = createHttp(baseUrl, fetchImpl, httpOptions)
 
   return {
+    // ---- Portaria provisória (ADR 0026): 204 = a senha enviada vale (ou a API não exige senha) ----
+    checkAccess: () => http.get('/access'),
+
     // ---- Perfil do usuário (provisório até existir login; ADR 0020 e 0024) ----
     getProfile: () => http.get('/me'),
     updateProfile: (patch) => http.patch('/me', patch),

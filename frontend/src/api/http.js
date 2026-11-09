@@ -14,16 +14,22 @@ export class ApiError extends Error {
   }
 }
 
-export function createHttp(baseUrl, fetchImpl = globalThis.fetch) {
+// `getAccessKey` e `onDenied` são opcionais (os testes não precisam deles): a senha vai no cabeçalho
+// X-Access-Key e, se a API disser que ela não vale, avisamos quem cuida da tela de senha.
+export function createHttp(baseUrl, fetchImpl = globalThis.fetch, { getAccessKey, onDenied } = {}) {
   const base = baseUrl.replace(/\/+$/, '')
 
   async function request(method, path, body) {
+    const headers = {}
+    if (body !== undefined) headers['Content-Type'] = 'application/json'
+    const chave = getAccessKey?.()
+    if (chave) headers['X-Access-Key'] = chave
     let res
     try {
       res = await fetchImpl(`${base}${path}`, {
         method,
         credentials: 'include',
-        headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },
+        headers,
         body: body === undefined ? undefined : JSON.stringify(body),
       })
     } catch {
@@ -38,6 +44,7 @@ export function createHttp(baseUrl, fetchImpl = globalThis.fetch) {
       /* resposta sem corpo JSON */
     }
     if (!res.ok) {
+      if (data?.error?.code === 'access_denied') onDenied?.()
       throw new ApiError(data?.error?.message ?? 'Algo deu errado. Tente de novo.', res.status, data?.error?.code ?? 'unknown')
     }
     return data

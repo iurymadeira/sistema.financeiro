@@ -16,7 +16,11 @@ function config() {
   };
 }
 
-const pool = new Pool({ ...config(), max: 10 });
+// Limites pensados para banco que dorme (Neon): poucas conexões, e desiste de esperar em vez de travar.
+const pool = new Pool({ ...config(), max: 5, idleTimeoutMillis: 30_000, connectionTimeoutMillis: 15_000 });
+
+// Sem isto, o banco derrubando uma conexão ociosa (acontece quando ele "dorme") encerraria o servidor inteiro.
+pool.on('error', (err) => console.error('Conexão ociosa do banco caiu (o pool abre outra):', err.message));
 
 module.exports = pool;
 module.exports.config = config;
