@@ -1,5 +1,5 @@
 // Peças visuais compartilhadas pelas telas novas.
-import { categoryColor, categoryIcon } from '../data/categories.js'
+import { categoryColor, categoryIcon } from './categoryVisuals.js'
 
 export const BLUE = '#1a63ff'
 

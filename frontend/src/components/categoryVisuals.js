@@ -1,3 +1,5 @@
+// Visual das categorias: cores e ícones. Fica em components/ (e não em domain/) porque depende do lucide-react,
+// e as regras de domain/ não podem conhecer biblioteca de tela. As categorias em si (nome, tipo, padrão) vêm da API.
 import {
   Baby,
   Banknote,
@@ -55,23 +57,6 @@ export const ICON_BANK = [
   'ShoppingCart', 'Coffee', 'HeartPulse', 'GraduationCap', 'Plane', 'Gift', 'Gamepad2', 'Dumbbell',
   'Shirt', 'PawPrint', 'Smartphone', 'Wifi', 'Fuel', 'Bus', 'Wrench', 'Baby',
   'Film', 'Music', 'BookOpen', 'PiggyBank', 'Landmark', 'Scissors', 'Pill', 'Sparkles',
-]
-
-export const ADJUSTMENT_ID = 'ajuste-financeiro'
-
-export const DEFAULT_CATEGORIES = [
-  // Despesas
-  { id: 'alimentacao', name: 'Alimentação', type: 'despesa', icon: 'Utensils' },
-  { id: 'transporte', name: 'Transporte', type: 'despesa', icon: 'Car' },
-  { id: 'moradia', name: 'Moradia', type: 'despesa', icon: 'Home' },
-  { id: 'energia', name: 'Conta de Energia', type: 'despesa', icon: 'Lightbulb' },
-  { id: 'agua', name: 'Conta de Água', type: 'despesa', icon: 'Droplets' },
-  // Receitas
-  { id: 'salario', name: 'Salário', type: 'receita', icon: 'Banknote' },
-  { id: 'investimentos', name: 'Investimentos', type: 'receita', icon: 'TrendingUp' },
-  { id: 'consultorias', name: 'Consultorias', type: 'receita', icon: 'Briefcase' },
-  // Uso exclusivo do sistema: nunca aparece para o usuário escolher e só é listada no histórico
-  { id: ADJUSTMENT_ID, name: 'Ajuste Financeiro', type: 'despesa', icon: 'Scale', system: true },
 ]
 
 export const categoryColor = (category) => (category.system ? COLORS.sistema : COLORS[category.type])

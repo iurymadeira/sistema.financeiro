@@ -12,8 +12,8 @@
  */
 import { useEffect, useRef, useState } from 'react'
 import { Check, X } from 'lucide-react'
-import { COLORS } from '../data/categories.js'
-import { formatShort, todayISO } from '../data/dates.js'
+import { COLORS } from '../components/categoryVisuals.js'
+import { formatShort, todayISO } from '../domain/dates.js'
 import { useFinanceData } from '../hooks/useFinanceData.js'
 import { BLUE, clickable, focusRing, money, tint } from '../components/ui.jsx'
 import { CategoryPicker, Field, MoneyInput, PAYMENT_METHODS, Pills, Segmented } from './Movimentacoes.jsx'

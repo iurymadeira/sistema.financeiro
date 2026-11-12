@@ -19,8 +19,8 @@ import {
   Trash2,
   X,
 } from 'lucide-react'
-import { COLORS, ICON_BANK, ICONS, categoryColor, categoryIcon } from '../data/categories.js'
-import { addMonths, formatShort, startOfMonthISO, todayISO } from '../data/dates.js'
+import { COLORS, ICON_BANK, ICONS, categoryColor, categoryIcon } from '../components/categoryVisuals.js'
+import { addMonths, formatShort, startOfMonthISO, todayISO } from '../domain/dates.js'
 import {
   displayDate,
   durationMonths,
@@ -29,7 +29,7 @@ import {
   isActive,
   nextOccurrence,
   occurrencesSoFar,
-} from '../data/recurrence.js'
+} from '../domain/recurrence.js'
 import { useFinanceData } from '../hooks/useFinanceData.js'
 import MesesDaRecorrencia from './MesesDaRecorrencia.jsx'
 import Link from 'next/link'

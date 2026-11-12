@@ -14,8 +14,8 @@
  */
 import { useMemo } from 'react'
 import { ArrowUpRight, ArrowDownRight, TrendingUp, Zap, Repeat, LineChart, History, Wallet } from 'lucide-react'
-import { monthSummary } from '../data/history.js'
-import { todayISO } from '../data/dates.js'
+import { monthSummary } from '../domain/history.js'
+import { todayISO } from '../domain/dates.js'
 import { useFinanceData } from '../hooks/useFinanceData.js'
 import Link from 'next/link'
 
