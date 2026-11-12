@@ -7,13 +7,13 @@
  * É uma estimativa, não uma garantia de rentabilidade.
  *
  * Dependências: react, lucide-react, Tailwind CSS (fonte Figtree configurada como font-sans).
- * Dados: src/api/apiRepository.js (via useFinanceData), src/data/history.js e src/data/projection.js.
+ * Dados: src/api/apiRepository.js (via useFinanceData), src/domain/history.js e src/domain/projection.js.
  */
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { ArrowLeft, Flag, Minus, Plus, Target, TrendingDown } from 'lucide-react'
-import { COLORS } from '../data/categories.js'
-import { todayISO } from '../data/dates.js'
-import { currentBalance, expandOccurrences } from '../data/history.js'
+import { COLORS } from '../components/categoryVisuals.js'
+import { todayISO } from '../domain/dates.js'
+import { currentBalance, expandOccurrences } from '../domain/history.js'
 import {
   MAX_YEARS,
   compactMoney,
@@ -26,7 +26,7 @@ import {
   simulate,
   spanShort,
   spanText,
-} from '../data/projection.js'
+} from '../domain/projection.js'
 import { useFinanceData } from '../hooks/useFinanceData.js'
 import { BLUE, clickable, focusRing, money } from '../components/ui.jsx'
 import { Field, MoneyInput, inputCls } from './Movimentacoes.jsx'

@@ -1,8 +1,8 @@
 // Testes das regras de recorrência. Rodar com: npm test  (usa o executor de testes do próprio Node)
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { durationMonths, endDateFromMonths, withinEnd } from '../src/data/recurrence.js'
-import { expandOccurrences } from '../src/data/history.js'
+import { durationMonths, endDateFromMonths, withinEnd } from '../src/domain/recurrence.js'
+import { expandOccurrences } from '../src/domain/history.js'
 
 const rec = (over = {}) => ({ id: 'r', type: 'despesa', categoryId: 'x', amount: 4000, recurring: true, date: '2026-01-05', endDate: null, ...over })
 
@@ -57,7 +57,7 @@ test('pontual conta só se a data já chegou', () => {
   assert.equal(expandOccurrences([m], '2026-10-01').length, 0)
 })
 
-import { endOfRecurrence } from '../src/data/recurrence.js'
+import { endOfRecurrence } from '../src/domain/recurrence.js'
 
 test('excluir recorrência antiga: encerra no último dia do mês anterior', () => {
   assert.deepEqual(endOfRecurrence(rec(), '2026-10-22'), { remove: false, endDate: '2026-09-30' })
@@ -86,7 +86,7 @@ test('encerrar e depois expandir: histórico fica até o mês anterior', () => {
 })
 
 /* ---------- Exceções (A3, ADR 0013) ---------- */
-import { applyException, findException, isValidExceptionFor, listRecurrenceMonths } from '../src/data/recurrence.js'
+import { applyException, findException, isValidExceptionFor, listRecurrenceMonths } from '../src/domain/recurrence.js'
 
 const ex = (over = {}) => ({ id: 'e', movementId: 'r', originalDate: '2026-03-05', newAmount: null, newDate: null, cancelled: false, ...over })
 const total = (occ) => occ.reduce((a, o) => a + o.amount, 0)
@@ -162,8 +162,8 @@ test('isValidExceptionFor: só meses que a regra realmente gera', () => {
 })
 
 /* ---------- Regras da lista de recorrências e resumo do Dashboard ---------- */
-import { displayDate, isActive, nextOccurrence, occurrencesSoFar } from '../src/data/recurrence.js'
-import { monthSummary } from '../src/data/history.js'
+import { displayDate, isActive, nextOccurrence, occurrencesSoFar } from '../src/domain/recurrence.js'
+import { monthSummary } from '../src/domain/history.js'
 
 test('occurrencesSoFar: conta as cobranças já ocorridas (início em jan, hoje em 10 de mar)', () => {
   assert.equal(occurrencesSoFar(rec(), '2026-03-10'), 3) // jan, fev, mar

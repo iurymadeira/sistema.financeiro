@@ -8,7 +8,7 @@
  */
 import { useEffect, useRef, useState } from 'react'
 import { Check, X } from 'lucide-react'
-import { COLORS } from '../data/categories.js'
+import { COLORS } from '../components/categoryVisuals.js'
 import { BLUE, clickable, focusRing } from '../components/ui.jsx'
 import { Field, Segmented, inputCls } from './Movimentacoes.jsx'
 

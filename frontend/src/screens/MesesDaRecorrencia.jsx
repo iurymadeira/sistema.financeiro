@@ -11,9 +11,9 @@
  */
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Ban, Check, ChevronLeft, ChevronRight, Pencil, Undo2, X } from 'lucide-react'
-import { COLORS, categoryColor } from '../data/categories.js'
-import { monthKey, monthShort, pad, todayISO } from '../data/dates.js'
-import { listRecurrenceMonths } from '../data/recurrence.js'
+import { COLORS, categoryColor } from '../components/categoryVisuals.js'
+import { monthKey, monthShort, pad, todayISO } from '../domain/dates.js'
+import { listRecurrenceMonths } from '../domain/recurrence.js'
 import { useFinanceData } from '../hooks/useFinanceData.js'
 import { BLUE, IconBubble, clickable, focusRing, money, tint } from '../components/ui.jsx'
 import { MoneyInput, inputCls } from './Movimentacoes.jsx'
