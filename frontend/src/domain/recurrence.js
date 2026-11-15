@@ -126,3 +126,12 @@ function monthsBetweenKeys(a, b) {
   const [by, bm] = b.split('-').map(Number)
   return (by - ay) * 12 + (bm - am)
 }
+
+// Recorrências que aparecem na lista da tela de Movimentações: só as ativas, nunca as de categorias do sistema
+// (o "Ajuste Financeiro" aparece apenas no histórico), da mais recente para a mais antiga.
+export function activeRecurrences(movements, catById, today) {
+  const monthStart = startOfMonthISO(today)
+  return movements
+    .filter((m) => catById[m.categoryId] && !catById[m.categoryId].system && m.recurring && isActive(m, today, monthStart))
+    .sort((a, b) => displayDate(b, today).localeCompare(displayDate(a, today)) || (b.createdAt ?? 0) - (a.createdAt ?? 0))
+}

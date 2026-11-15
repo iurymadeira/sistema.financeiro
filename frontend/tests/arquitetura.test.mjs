@@ -46,8 +46,9 @@ for (const [pasta, regra] of Object.entries(PROIBIDO)) {
 }
 
 // Uma tela não pode depender de outra tela (foi o que acontecia: 4 telas importavam peças de dentro de
-// Movimentacoes.jsx). Peça usada por mais de uma tela vai para components/. Única exceção combinada:
-// a janela "meses da recorrência" é filha da tela de Movimentações.
+// Movimentacoes.jsx). Peça usada por mais de uma tela vai para components/. Combinados:
+// - a janela "meses da recorrência" é filha da tela de Movimentações;
+// - uma tela pode ter uma subpasta própria (screens/movimentacoes/), que só ela e os arquivos da própria subpasta usam.
 const PERMITIDO_ENTRE_TELAS = new Set(['Movimentacoes.jsx->MesesDaRecorrencia.jsx'])
 
 test('screens/ não importa outras telas (só as exceções combinadas)', () => {
@@ -57,8 +58,13 @@ test('screens/ não importa outras telas (só as exceções combinadas)', () => 
     for (const m of texto.matchAll(/from\s+['"](\.[^'"]+)['"]/g)) {
       const alvo = resolve(dirname(arq), m[1])
       if (relative(SRC, alvo).split(sep)[0] !== 'screens') continue
-      const par = `${relative(telas, arq)}->${relative(telas, alvo)}`
-      assert.ok(PERMITIDO_ENTRE_TELAS.has(par), `${par}: uma tela importa outra tela. Mova a peça comum para components/.`)
+      const de = relative(telas, arq)
+      const para = relative(telas, alvo)
+      const subpastaDe = de.includes(sep) ? de.split(sep)[0] : null
+      const subpastaPara = para.includes(sep) ? para.split(sep)[0] : null
+      const mesmaSubpasta = subpastaDe && subpastaDe === subpastaPara
+      const telaDona = !subpastaDe && subpastaPara && de.toLowerCase() === `${subpastaPara}.jsx`
+      assert.ok(mesmaSubpasta || telaDona || PERMITIDO_ENTRE_TELAS.has(`${de}->${para}`), `${de}->${para}: uma tela importa outra tela. Mova a peça comum para components/.`)
     }
   }
 })
