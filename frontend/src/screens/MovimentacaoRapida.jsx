@@ -16,7 +16,12 @@ import { COLORS } from '../components/categoryVisuals.js'
 import { formatShort, todayISO } from '../domain/dates.js'
 import { useFinanceData } from '../hooks/useFinanceData.js'
 import { BLUE, clickable, focusRing, money, tint } from '../components/ui.jsx'
-import { CategoryPicker, Field, MoneyInput, PAYMENT_METHODS, Pills, Segmented } from './Movimentacoes.jsx'
+import CategoryPicker from '../components/form/CategoryPicker.jsx'
+import Field from '../components/form/Field.jsx'
+import MoneyInput from '../components/form/MoneyInput.jsx'
+import Pills from '../components/form/Pills.jsx'
+import Segmented from '../components/form/Segmented.jsx'
+import { PAYMENT_METHODS } from '../domain/paymentMethods.js'
 
 const emptyForm = (type = 'despesa') => ({ type, categoryId: null, amount: 0, description: '', method: 'PIX' })
 

@@ -9,8 +9,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { Check, X } from 'lucide-react'
 import { COLORS } from '../components/categoryVisuals.js'
-import { BLUE, clickable, focusRing } from '../components/ui.jsx'
-import { Field, Segmented, inputCls } from './Movimentacoes.jsx'
+import { BLUE, clickable, focusRing, inputCls } from '../components/ui.jsx'
+import Field from '../components/form/Field.jsx'
+import Segmented from '../components/form/Segmented.jsx'
 
 const MAX_PHOTO_MB = 5
 const PHOTO_SIZE = 256

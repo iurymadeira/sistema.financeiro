@@ -44,3 +44,21 @@ for (const [pasta, regra] of Object.entries(PROIBIDO)) {
     }
   })
 }
+
+// Uma tela não pode depender de outra tela (foi o que acontecia: 4 telas importavam peças de dentro de
+// Movimentacoes.jsx). Peça usada por mais de uma tela vai para components/. Única exceção combinada:
+// a janela "meses da recorrência" é filha da tela de Movimentações.
+const PERMITIDO_ENTRE_TELAS = new Set(['Movimentacoes.jsx->MesesDaRecorrencia.jsx'])
+
+test('screens/ não importa outras telas (só as exceções combinadas)', () => {
+  const telas = join(SRC, 'screens')
+  for (const arq of arquivos(telas)) {
+    const texto = readFileSync(arq, 'utf8')
+    for (const m of texto.matchAll(/from\s+['"](\.[^'"]+)['"]/g)) {
+      const alvo = resolve(dirname(arq), m[1])
+      if (relative(SRC, alvo).split(sep)[0] !== 'screens') continue
+      const par = `${relative(telas, arq)}->${relative(telas, alvo)}`
+      assert.ok(PERMITIDO_ENTRE_TELAS.has(par), `${par}: uma tela importa outra tela. Mova a peça comum para components/.`)
+    }
+  }
+})

@@ -2,6 +2,7 @@
 import { categoryColor, categoryIcon } from './categoryVisuals.js'
 
 export const BLUE = '#1a63ff'
+export const BLUE_TEXT = '#5b8dff' // azul mais claro, legível como cor de texto sobre fundo escuro
 
 const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
 export const money = (cents) => brl.format(cents / 100)
@@ -9,6 +10,8 @@ export const tint = (hex, alpha) => `${hex}${alpha}`
 
 export const clickable = 'cursor-pointer disabled:cursor-not-allowed'
 export const focusRing = 'outline-none focus-visible:ring-2 focus-visible:ring-white/60'
+export const inputCls =
+  'h-[var(--ctl)] w-full rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-white placeholder:text-zinc-500 outline-none transition-colors focus:border-[#1a63ff] disabled:opacity-40'
 
 export function Avatar({ name, src }) {
   return (
