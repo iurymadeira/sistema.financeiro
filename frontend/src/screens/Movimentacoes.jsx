@@ -9,7 +9,6 @@ import {
   ArrowLeft,
   CalendarDays,
   Check,
-  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Inbox,
@@ -19,8 +18,16 @@ import {
   Trash2,
   X,
 } from 'lucide-react'
-import { COLORS, ICON_BANK, ICONS, categoryColor, categoryIcon } from '../components/categoryVisuals.js'
+import Link from 'next/link'
+import { COLORS, categoryColor } from '../components/categoryVisuals.js'
+import Field from '../components/form/Field.jsx'
+import CategoryPicker from '../components/form/CategoryPicker.jsx'
+import MoneyInput from '../components/form/MoneyInput.jsx'
+import Pills from '../components/form/Pills.jsx'
+import Segmented from '../components/form/Segmented.jsx'
+import { BLUE, BLUE_TEXT, IconBubble, clickable, focusRing, inputCls, money, tint } from '../components/ui.jsx'
 import { addMonths, formatShort, startOfMonthISO, todayISO } from '../domain/dates.js'
+import { PAYMENT_METHODS } from '../domain/paymentMethods.js'
 import {
   displayDate,
   durationMonths,
@@ -32,316 +39,11 @@ import {
 } from '../domain/recurrence.js'
 import { useFinanceData } from '../hooks/useFinanceData.js'
 import MesesDaRecorrencia from './MesesDaRecorrencia.jsx'
-import Link from 'next/link'
 
-const BLUE = '#1a63ff'
-export const BLUE_TEXT = '#5b8dff'
-export const PAYMENT_METHODS = ['PIX', 'Dinheiro', 'Boleto', 'Crédito', 'Débito']
 const MIN_MONTHS = 2
 const MAX_MONTHS = 12
 const ROW_H = 64 // altura de cada linha da lista (h-16)
 const ROW_GAP = 8 // espaço entre linhas (gap-2)
-
-const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
-const money = (cents) => brl.format(cents / 100)
-const tint = (hex, alpha) => `${hex}${alpha}`
-
-const clickable = 'cursor-pointer disabled:cursor-not-allowed'
-const focusRing = 'outline-none focus-visible:ring-2 focus-visible:ring-white/60'
-export const inputCls =
-  'h-[var(--ctl)] w-full rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-white placeholder:text-zinc-500 outline-none transition-colors focus:border-[#1a63ff] disabled:opacity-40'
-
-/* ---------- Peças pequenas ---------- */
-
-function IconBubble({ category, size = 'size-10', icon = 'size-5' }) {
-  const Icon = categoryIcon(category)
-  const color = categoryColor(category)
-  return (
-    <span
-      className={`grid shrink-0 place-items-center rounded-full ${size}`}
-      style={{ backgroundColor: tint(color, '1f'), color }}
-    >
-      <Icon className={icon} strokeWidth={1.75} />
-    </span>
-  )
-}
-
-export function Field({ label, htmlFor, children }) {
-  const Tag = htmlFor ? 'label' : 'span'
-  return (
-    <div className="flex flex-col gap-2">
-      <Tag htmlFor={htmlFor} className="text-sm text-zinc-400">
-        {label}
-      </Tag>
-      {children}
-    </div>
-  )
-}
-
-export function Segmented({ label, options, value, onChange, disabled }) {
-  return (
-    <div
-      role="radiogroup"
-      aria-label={label}
-      className={`flex h-[var(--ctl)] rounded-full border border-white/10 bg-white/5 p-1 ${disabled ? 'opacity-60' : ''}`}
-    >
-      {options.map((o) => {
-        const active = o.value === value
-        const color = o.color ?? '#ffffff'
-        return (
-          <button
-            key={o.value}
-            type="button"
-            role="radio"
-            aria-checked={active}
-            disabled={disabled}
-            onClick={() => onChange(o.value)}
-            className={`flex-1 rounded-full text-sm font-medium transition-colors ${clickable} ${focusRing} ${
-              active ? '' : 'text-zinc-400 hover:text-white'
-            }`}
-            style={
-              active
-                ? { backgroundColor: tint(color, '26'), color, boxShadow: `inset 0 0 0 1px ${tint(color, '66')}` }
-                : undefined
-            }
-          >
-            {o.label}
-          </button>
-        )
-      })}
-    </div>
-  )
-}
-
-export function Pills({ label, options, value, onChange }) {
-  return (
-    <div role="radiogroup" aria-label={label} className="flex min-h-[var(--ctl)] flex-wrap items-center gap-2">
-      {options.map((option) => {
-        const active = option === value
-        return (
-          <button
-            key={option}
-            type="button"
-            role="radio"
-            aria-checked={active}
-            onClick={() => onChange(option)}
-            className={`h-9 rounded-full border px-3.5 text-sm transition-colors ${clickable} ${focusRing} ${
-              active
-                ? 'border-transparent text-white'
-                : 'border-white/10 bg-white/5 text-zinc-300 hover:border-white/25'
-            }`}
-            style={active ? { backgroundColor: BLUE } : undefined}
-          >
-            {option}
-          </button>
-        )
-      })}
-    </div>
-  )
-}
-
-export function MoneyInput({ id, value, onChange }) {
-  return (
-    <input
-      id={id}
-      inputMode="numeric"
-      autoComplete="off"
-      placeholder="R$ 0,00"
-      value={value > 0 ? money(value) : ''}
-      onChange={(e) => {
-        const digits = e.target.value.replace(/\D/g, '').slice(0, 11)
-        onChange(digits ? parseInt(digits, 10) : 0)
-      }}
-      className={`${inputCls} text-base font-semibold tabular-nums`}
-    />
-  )
-}
-
-/* ---------- Seleção de categoria (com criação de novas) ---------- */
-
-export function CategoryPicker({ id, categories, type, value, disabled, onChange, onCreate }) {
-  const [open, setOpen] = useState(false)
-  const [creating, setCreating] = useState(false)
-  const [name, setName] = useState('')
-  const [icon, setIcon] = useState(ICON_BANK[0])
-  const [error, setError] = useState('')
-  const rootRef = useRef(null)
-
-  const color = COLORS[type]
-  // A categoria "Ajuste Financeiro" (system) nunca aparece aqui
-  const options = categories.filter((c) => c.type === type && !c.system)
-  const selected = categories.find((c) => c.id === value)
-
-  const close = () => {
-    setOpen(false)
-    setCreating(false)
-    setError('')
-  }
-
-  useEffect(() => {
-    if (!open) return undefined
-    const onDown = (e) => {
-      if (rootRef.current && !rootRef.current.contains(e.target)) close()
-    }
-    const onKey = (e) => {
-      if (e.key === 'Escape') close()
-    }
-    document.addEventListener('mousedown', onDown)
-    document.addEventListener('keydown', onKey)
-    return () => {
-      document.removeEventListener('mousedown', onDown)
-      document.removeEventListener('keydown', onKey)
-    }
-  }, [open])
-
-  const submitNew = async () => {
-    try {
-      const created = await onCreate({ name, type, icon })
-      onChange(created.id)
-      setName('')
-      close()
-    } catch (err) {
-      setError(err.message)
-    }
-  }
-
-  return (
-    <div ref={rootRef} className="relative">
-      <button
-        id={id}
-        type="button"
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        disabled={disabled}
-        onClick={() => setOpen((o) => !o)}
-        className={`${inputCls} flex items-center gap-3 text-left ${clickable}`}
-      >
-        {selected ? (
-          <>
-            <IconBubble category={selected} size="size-7" icon="size-4" />
-            <span className="flex-1 truncate">{selected.name}</span>
-          </>
-        ) : (
-          <span className="flex-1 text-zinc-500">Escolher categoria</span>
-        )}
-        <ChevronDown className="size-4 shrink-0 text-zinc-400" strokeWidth={1.75} />
-      </button>
-
-      {open && (
-        <div className="absolute left-0 right-0 top-full z-30 mt-2 rounded-3xl border border-white/10 bg-[#111114] p-3 shadow-2xl shadow-black/60">
-          {creating ? (
-            <div className="flex flex-col gap-3">
-              <input
-                autoFocus
-                value={name}
-                maxLength={24}
-                onChange={(e) => {
-                  setName(e.target.value)
-                  setError('')
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    submitNew()
-                  }
-                }}
-                placeholder="Nome da categoria"
-                aria-label="Nome da nova categoria"
-                className={inputCls}
-              />
-              <div role="radiogroup" aria-label="Ícone da categoria" className="grid grid-cols-8 gap-1.5">
-                {ICON_BANK.map((key) => {
-                  const Icon = ICONS[key]
-                  const active = key === icon
-                  return (
-                    <button
-                      key={key}
-                      type="button"
-                      role="radio"
-                      aria-checked={active}
-                      aria-label={key}
-                      onClick={() => setIcon(key)}
-                      className={`grid aspect-square place-items-center rounded-xl border transition-colors ${clickable} ${focusRing} ${
-                        active ? '' : 'border-transparent text-zinc-400 hover:bg-white/10 hover:text-white'
-                      }`}
-                      style={
-                        active
-                          ? { backgroundColor: tint(color, '1f'), borderColor: tint(color, '88'), color }
-                          : undefined
-                      }
-                    >
-                      <Icon className="size-4" strokeWidth={1.75} />
-                    </button>
-                  )
-                })}
-              </div>
-              <p className="text-xs text-zinc-500">
-                {type === 'despesa' ? 'Despesas usam ícones vermelhos.' : 'Receitas usam ícones verdes.'}
-              </p>
-              {error && (
-                <p role="alert" className="text-xs" style={{ color: COLORS.despesa }}>
-                  {error}
-                </p>
-              )}
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCreating(false)
-                    setError('')
-                  }}
-                  className={`h-9 rounded-full border border-white/10 px-4 text-sm text-zinc-300 hover:bg-white/10 ${clickable} ${focusRing}`}
-                >
-                  Voltar
-                </button>
-                <button
-                  type="button"
-                  disabled={!name.trim()}
-                  onClick={submitNew}
-                  className={`h-9 rounded-full px-4 text-sm font-medium text-white disabled:opacity-40 ${clickable} ${focusRing}`}
-                  style={{ backgroundColor: BLUE }}
-                >
-                  Criar categoria
-                </button>
-              </div>
-            </div>
-          ) : (
-            <>
-              <ul role="listbox" aria-label="Categorias" className="grid max-h-56 grid-cols-2 gap-1.5 overflow-y-auto">
-                {options.map((c) => (
-                  <li key={c.id} role="option" aria-selected={c.id === value}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onChange(c.id)
-                        close()
-                      }}
-                      className={`flex h-11 w-full items-center gap-2.5 rounded-2xl border px-2.5 text-left text-sm transition-colors ${clickable} ${focusRing} ${
-                        c.id === value ? 'border-white/25 bg-white/10' : 'border-transparent hover:bg-white/5'
-                      }`}
-                    >
-                      <IconBubble category={c} size="size-7" icon="size-4" />
-                      <span className="truncate">{c.name}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-              <button
-                type="button"
-                onClick={() => setCreating(true)}
-                className={`mt-2 flex h-10 w-full items-center gap-2 rounded-2xl px-3 text-sm hover:bg-white/5 ${clickable} ${focusRing}`}
-                style={{ color: BLUE_TEXT }}
-              >
-                <Plus className="size-4" strokeWidth={1.75} />
-                Nova categoria
-              </button>
-            </>
-          )}
-        </div>
-      )}
-    </div>
-  )
-}
 
 /* ---------- Duração da recorrência ---------- */
 

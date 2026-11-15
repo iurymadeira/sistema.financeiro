@@ -15,8 +15,8 @@ import { COLORS, categoryColor } from '../components/categoryVisuals.js'
 import { monthKey, monthShort, pad, todayISO } from '../domain/dates.js'
 import { listRecurrenceMonths } from '../domain/recurrence.js'
 import { useFinanceData } from '../hooks/useFinanceData.js'
-import { BLUE, IconBubble, clickable, focusRing, money, tint } from '../components/ui.jsx'
-import { MoneyInput, inputCls } from './Movimentacoes.jsx'
+import { BLUE, IconBubble, clickable, focusRing, inputCls, money, tint } from '../components/ui.jsx'
+import MoneyInput from '../components/form/MoneyInput.jsx'
 
 const PER_PAGE = 6
 const dayOf = (iso) => Number(iso.slice(8, 10))

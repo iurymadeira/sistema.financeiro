@@ -28,8 +28,9 @@ import {
   spanText,
 } from '../domain/projection.js'
 import { useFinanceData } from '../hooks/useFinanceData.js'
-import { BLUE, clickable, focusRing, money } from '../components/ui.jsx'
-import { Field, MoneyInput, inputCls } from './Movimentacoes.jsx'
+import { BLUE, clickable, focusRing, inputCls, money } from '../components/ui.jsx'
+import Field from '../components/form/Field.jsx'
+import MoneyInput from '../components/form/MoneyInput.jsx'
 import Link from 'next/link'
 
 const GREEN = COLORS.receita
