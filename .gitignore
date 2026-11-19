@@ -6,7 +6,6 @@ dist/
 
 .env
 .env.*
-!.env_example
 !.env.example
 CLAUDE.md
 /docs/

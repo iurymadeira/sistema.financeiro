@@ -1,16 +1,9 @@
 /**
  * Dashboard.jsx — Tela inicial do app de finanças pessoais
  *
- * Dependências:  npm i lucide-react
- * Tailwind (v3.4+): adicione a fonte no tailwind.config.js
+ * Dependências: lucide-react e Tailwind (a fonte vem do layout).
  *
- *   theme: { extend: { fontFamily: { sans: ['Figtree', 'ui-sans-serif', 'system-ui', 'sans-serif'] } } }
- *
- * E carregue a Figtree no seu index.html (ou no CSS global):
- *
- *   <link rel="preconnect" href="https://fonts.googleapis.com" />
- *   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
- *   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet" />
+ * A fonte Figtree é carregada em src/app/layout.jsx (pacote @fontsource-variable/figtree).
  */
 import { useMemo } from 'react'
 import { ArrowUpRight, ArrowDownRight, TrendingUp, Zap, Repeat, LineChart, History, Wallet } from 'lucide-react'
@@ -40,7 +33,6 @@ const CARDS = [
     title: 'Movimentação rápida',
     description: 'Registre uma entrada ou saída em segundos',
     icon: Zap,
-    href: '/movimentacao-rapida',
     primary: true,
   },
   {
@@ -92,39 +84,23 @@ function Avatar({ name, src, onClick }) {
   )
 }
 
+// Card de navegação. Se tiver `href`, é um link (vai para outra página). Se tiver `onClick` e não tiver `href`,
+// é uma AÇÃO (abre uma janela), então usamos <button>: link sem destino real fazia o Next buscar uma página que não existe.
 function NavCard({ title, description, icon: Icon, href, primary, onClick }) {
-  return (
-    <Link
-      href={href}
-      onClick={
-        onClick
-          ? (e) => {
-              e.preventDefault()
-              onClick()
-            }
-          : undefined
-      }
-      className={[
-        'group flex min-h-44 flex-col justify-between rounded-3xl border p-6 outline-none transition-colors',
-        'focus-visible:ring-2 focus-visible:ring-white/70',
-        primary
-          ? 'border-transparent text-white'
-          : 'border-white/10 bg-[#0C0C0E] hover:border-white/20',
-      ].join(' ')}
-      style={primary ? { backgroundColor: BLUE } : undefined}
-    >
+  const className = [
+    'group flex min-h-44 flex-col justify-between rounded-3xl border p-6 text-left outline-none transition-colors',
+    'focus-visible:ring-2 focus-visible:ring-white/70',
+    primary ? 'border-transparent text-white' : 'border-white/10 bg-[#0C0C0E] hover:border-white/20',
+  ].join(' ')
+  const style = primary ? { backgroundColor: BLUE } : undefined
+  const conteudo = (
+    <>
       <div className="flex items-start justify-between">
-        <Icon
-          className="size-10 lg:size-12"
-          strokeWidth={1.25}
-          style={{ color: primary ? '#fff' : BLUE_ICON }}
-        />
+        <Icon className="size-10 lg:size-12" strokeWidth={1.25} style={{ color: primary ? '#fff' : BLUE_ICON }} />
         <span
           className={[
             'grid size-8 place-items-center rounded-full border transition-colors',
-            primary
-              ? 'border-white/30 group-hover:bg-white/15'
-              : 'border-white/10 text-zinc-300 group-hover:bg-white/10',
+            primary ? 'border-white/30 group-hover:bg-white/15' : 'border-white/10 text-zinc-300 group-hover:bg-white/10',
           ].join(' ')}
         >
           <ArrowUpRight className="size-3.5" strokeWidth={1.5} />
@@ -135,7 +111,16 @@ function NavCard({ title, description, icon: Icon, href, primary, onClick }) {
         <h2 className="text-lg font-medium leading-tight">{title}</h2>
         <p className={primary ? 'text-sm text-white/80' : 'text-sm text-zinc-400'}>{description}</p>
       </div>
+    </>
+  )
+  return href ? (
+    <Link href={href} className={className} style={style}>
+      {conteudo}
     </Link>
+  ) : (
+    <button type="button" onClick={onClick} className={className} style={style}>
+      {conteudo}
+    </button>
   )
 }
 
@@ -232,7 +217,7 @@ export default function Dashboard({
           className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-rows-2"
         >
           {CARDS.map((card) => (
-            <NavCard key={card.id} {...card} href={card.href} onClick={card.id === 'rapida' ? onQuickAdd : undefined} />
+            <NavCard key={card.id} {...card} onClick={card.id === 'rapida' ? onQuickAdd : undefined} />
           ))}
         </nav>
       </div>

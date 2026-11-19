@@ -17,7 +17,7 @@ Pré-requisitos: Node.js 22 e Docker.
 
 ```bash
 # 1) Banco de dados (Postgres + Adminer em http://localhost:8080)
-cp backend/.env_example backend/.env     # ajuste a senha
+cp backend/.env.example backend/.env     # ajuste a senha
 docker compose --env-file backend/.env up -d
 
 # 2) Back-end (porta 5000)
