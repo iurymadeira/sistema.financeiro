@@ -1,3 +1,4 @@
+import '@fontsource-variable/figtree' // fonte Figtree empacotada no próprio site (sem pedir nada ao Google em tempo de uso)
 import './globals.css'
 import AccessGate from '../components/AccessGate.jsx'
 import AppShell from '../components/AppShell.jsx'
@@ -11,11 +12,6 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="pt-BR">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet" />
-      </head>
       <body>
         <AccessGate>
           <AppShell>{children}</AppShell>
