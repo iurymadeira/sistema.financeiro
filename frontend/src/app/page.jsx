@@ -1,7 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useShell } from '../components/AppShell.jsx'
+import { useShell } from '../shell/AppShell.jsx'
 
 const Dashboard = dynamic(() => import('../screens/Dashboard.jsx'), { ssr: false })
 

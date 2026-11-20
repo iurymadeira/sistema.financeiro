@@ -27,9 +27,12 @@ function importsDe(arquivo) {
 
 // pasta -> o que ela NÃO pode importar
 const PROIBIDO = {
-  domain: { pastas: ['api', 'hooks', 'screens', 'components', 'app'], pacotes: ['react', 'react-dom', 'next', 'lucide-react'] },
-  api: { pastas: ['hooks', 'screens', 'components', 'app'], pacotes: ['react', 'next', 'lucide-react'] },
-  hooks: { pastas: ['screens', 'components', 'app'], pacotes: ['next', 'lucide-react'] },
+  domain: { pastas: ['api', 'hooks', 'screens', 'components', 'shell', 'app'], pacotes: ['react', 'react-dom', 'next', 'lucide-react'] },
+  api: { pastas: ['hooks', 'screens', 'components', 'shell', 'app'], pacotes: ['react', 'next', 'lucide-react'] },
+  hooks: { pastas: ['screens', 'components', 'shell', 'app'], pacotes: ['next', 'lucide-react'] },
+  components: { pastas: ['api', 'hooks', 'screens', 'shell', 'app'], pacotes: [] },
+  screens: { pastas: ['shell', 'app'], pacotes: [] },
+  shell: { pastas: ['app'], pacotes: [] },
 }
 
 for (const [pasta, regra] of Object.entries(PROIBIDO)) {
